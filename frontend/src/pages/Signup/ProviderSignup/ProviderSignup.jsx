@@ -1,5 +1,6 @@
 import './ProviderSignup.css'
-import GetLocation from '../../../Utils/Location/GetLocation.js'
+import GetLocation from '../../../Utils/GetLocation.js'
+import { compressImage } from '../../../Utils/CompressImage.js';
 import {useState} from 'react'
 
 function ProviderSignup() {
@@ -7,6 +8,26 @@ function ProviderSignup() {
   const [locationText, setLocationText] = useState("Get Location")
   const [locationErr, setlocationErr] = useState("");
   const [locationBtnBorder, setLocationBtnBorder] = useState("2px solid rgb(86, 189, 230)")
+  const [imgBorder, setImgBorder] = useState("2px solid rgb(86, 189, 230)")
+  const [compressedImage, setCompressedImage] = useState(null)
+
+  const handleUpload = async (e)=>{
+    const file = e.target.files[0];
+    if(!file){
+      return;
+    } 
+    
+    try{
+      const compressed = await compressImage(file);
+      setCompressedImage(compressed);
+      const formData = new FormData();
+      formData.append("image", compressed);
+      setImgBorder("2px solid green")
+      console.log("commpression complete")
+    } catch(err){
+      console.error("Compression error:", err);
+    }
+  }
 
   const handleLocation = async() =>{
       try{
@@ -94,7 +115,14 @@ function ProviderSignup() {
           </div>
           <div className="location-btn-container">
             <button className="location-btn hoverEffect" type="button" onClick={handleLocation} style={{border : locationBtnBorder}}>{locationText}</button>
+          </div> 
+        </div>
+        <div className="signup-form-element">
+            <label htmlFor="imgUpload" className='signup-form-label'>Upload Image</label>
+            <input type="file" accept="image/png" onChange={handleUpload} style={{border : imgBorder}} className='img-input'/>
           </div>
+        <div className="upload-img">
+          <button type="submit" className="signup-submit-btn">Submit</button>
         </div>
       </form>
       </div>

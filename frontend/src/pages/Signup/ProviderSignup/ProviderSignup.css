@@ -12,7 +12,7 @@
     width: 400px;
     background-color: white;
     border-radius: 10px;
-    padding: 20px;
+    padding: 20px 30px;
 }
 
 .provider-signup{
@@ -129,6 +129,74 @@
     height: 20px;
     color: rgb(62, 62, 62);
 }
+
+
+.img-input{
+    border: green;
+}
+
+.signup-submit-btn{
+    color: white;
+    display: block;
+    background-color: green;
+    width: 80px;
+    border: none;
+    height: 30px;
+    margin: 10px auto ;
+    border-radius: 5px;
+}
+
+.signup-submit-btn:hover{
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 420px){
+    .provider-signup-container{
+        padding: 0;
+    }
+
+    .provider-signup-form-container{
+    width: 100vw !important;
+    height: 100% !important;
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 0px !important;
+    }     
+}
+
+@media only screen and (max-width: 400px){
+    .provider-signup-form-container{
+    padding: 10px;
+    }     
+    .signup-form-element{
+        flex-direction: column;
+    }
+
+    .img-input{
+        width: 60% !important;
+        height: 30px;
+    }
+
+    .location-btn-container{
+    width: 200px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: 40px;
+}
+
+.provider-signup .top-heading p{
+    font-size: 0.7rem;
+}
+
+.provider-signup-heading{
+    font-size: 1.2rem;
+}
+
+}
+
+
+
 
 
 
