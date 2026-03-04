@@ -56,5 +56,19 @@
     justify-content: space-between;
 }
 
+.type-writer{
+    font-size: 1.2rem;
+    display: flex;
+    width: 200px;
+    gap: 8px;
+}
+
+.typewriter-text {
+  display: inline-block;
+  width: 120px;
+  text-align: left;
+  color:#2563eb !important;
+}
+
 
 
