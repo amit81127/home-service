@@ -1,5 +1,5 @@
 body{
-   background: linear-gradient(180deg, #F4F7F9 0%, #F4F7F9 100%);
+   background: linear-gradient(180deg, #F4F7F9 0%, #F4F7F9 100%) !important;
 }
 
 

@@ -2,7 +2,7 @@ import "./Home.css";
 import axios from "axios";
 import Navbar from "../../components/Navbar/Navbar";
 import { useEffect, useState , useRef} from "react";
-import Searchbar from "../../components/Searchbar/SearchBar";
+import Searchbar from "../../components/Searchbar/Searchbar.jsx";
 import CategoryList from "../../components/CategoryList/CategoryList";
 import Footer from "../../components/Footer/Footer";
 import Typewriter from "typewriter-effect";
@@ -44,7 +44,7 @@ function Home() {
 
   return (
     <>
-      <Navbar scroolToServices={scroolToServices}></Navbar>
+      <Navbar ></Navbar>
       <section className="hero-section">
         <div className="hero-section-container">
           <div className="hero">
@@ -60,7 +60,7 @@ function Home() {
               Find best home services/repairs near you
             </h2>
           </div>
-          <Searchbar />
+          <Searchbar ref={serviceRef}/>
         </div>
         <div className="type-writer">
           <span>Avaliable at </span>
@@ -77,8 +77,11 @@ function Home() {
           </span> 
         </div>
       </section>
-      <CategoryList categoryList={categories} changeCategory={setCategory} scroolToServices={scroolToServices}/>
-      <ServiceProviderList providerInfo={providerInfo} currentCategory={category} ref={serviceRef}/>   
+      <CategoryList categoryList={categories}/>
+      <h2 style={{fontWeight : "500", marginTop: "20px", padding : "0 10px"}}>
+          {category} Providers
+      </h2>
+      <ServiceProviderList providerInfo={providerInfo} currentCategory={category} />   
       <Footer />
     </>
   );

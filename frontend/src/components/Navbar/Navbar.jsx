@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState , useEffect} from "react";
 
 
-function Navbar({scroolToServices}) {
+function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDisplay, setDisplay] = useState(false);
   const currentPage = useLocation();
@@ -21,10 +21,8 @@ function Navbar({scroolToServices}) {
       return () => clearTimeout(timeoutId);
     }
   }, [isDisplay]);
-  
-  function handleSignupClick(){
-    setDisplay(true); 
-  }
+
+  const category= "Popular"
 
   return (
     <>
@@ -40,7 +38,7 @@ function Navbar({scroolToServices}) {
             </li>
             {!hideServiceIcon && (
               <li className="nav-link">
-              <Link onClick={scroolToServices}>Services</Link>
+              <Link to={`/Services/${category}`}>Services</Link>
             </li>
             )}
             <li className="nav-link">
@@ -91,7 +89,7 @@ function Navbar({scroolToServices}) {
             </Link>
             <Link
               className="drop-link"
-              onClick={scroolToServices}
+              to={`/Services/${category}`}
             >
               Services
             </Link>

@@ -7,6 +7,7 @@ import Login from './pages/Login/Login'
 import Signup from './pages/Signup/Signup'
 import ProviderSignup from './pages/Signup/ProviderSignup/ProviderSignup'
 import CustomerSignup from './pages/Signup/CustomerSignup/CustomerSignup'
+import SearchResult from './pages/SearchResult/SearchResult'
 
 function App() {
 
@@ -14,7 +15,8 @@ function App() {
     <>  
     <Routes>
       <Route path="/" element={<Home/>} />
-      <Route path="/Services" element={ <Services/>}/>
+      <Route path="/Services/:category" element={ <Services/>}/>
+      <Route path="/SerchResult/:category" element={ <SearchResult/>}/>
       <Route path="/About" element={ <About/>}/>
       <Route path="/Login" element={ <Login/>}/>
       <Route path="/Signup" element={ <Signup/>}/>

@@ -6,8 +6,9 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import GrassIcon from '@mui/icons-material/Grass';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
+import PestControlIcon from '@mui/icons-material/PestControl';
 import "./CategoryList.css";
-import{Link} from "react-router-dom"
+import{useNavigate} from "react-router-dom"
 
 const icons = {
   cleaning: (
@@ -59,9 +60,9 @@ const icons = {
       sx={{ height: 40, width: 40 }}
     />
   ),
-  carwash: (
-    <LocalCarWashIcon
-      id="carwash"
+  pest_control: (
+    <PestControlIcon
+      id="pestControl"
       className="service-icon"
       sx={{ height: 40, width: 40 }}
     />
@@ -69,10 +70,14 @@ const icons = {
 };
 
 function CategoryList({ categoryList , changeCategory,scroolToServices}) {
+  const navigate = useNavigate();
+
   const handleCategoryListOnClick = (category)=>{
-    changeCategory(category.name);
-    scroolToServices();
+    navigate(`/Services/${category.name}`)
   }
+
+
+
   return (
     <>
       <div className="all-cat">

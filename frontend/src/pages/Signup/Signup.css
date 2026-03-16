@@ -47,6 +47,23 @@
     margin: 20px;
 }
 
+.signup-container{
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #d0e0ef 0%, #c1d9f1 100%);
+    padding: 30px
+}
+
+.signup-form-container{
+    width: 400px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px 30px;
+}
+
 @media only screen and (max-width: 400px){
     .choose-page{
         border-radius: 0;
