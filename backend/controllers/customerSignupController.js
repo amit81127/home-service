@@ -1,24 +1,13 @@
 import pool from "../config/db.js";
-import bycrpt from "bcrypt";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-export const providerSignup = async (req, res) => {
+export const customerSignup = async (req, res) => {
   try {
-    let {
-      fullname,
-      username,
-      password,
-      email,
-      phone,
-      category,
-      experience,
-      address,
-      description,
-      price,
-      business_name,
-    } = req.body;
+    let { fullname, username, password, email, phone, address } = req.body;
 
     username = username.toLowerCase();
-    const role = "service_provider";
+    const role = "customer";
     const checkUsername = await pool.query(
       "SELECT id FROM users WHERE username=$1",
       [username],
@@ -42,7 +31,7 @@ export const providerSignup = async (req, res) => {
     }
 
     const checkPhone = await pool.query(
-      "SELECT user_id FROM service_provider_info WHERE contact=$1",
+      "SELECT user_id FROM customer_info WHERE contact=$1",
       [phone],
     );
 
@@ -53,7 +42,13 @@ export const providerSignup = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bycrpt.hash(password, 10);
+    if (!req.body.location) {
+      return res.status(400).json({
+        message: "Location is required",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
       `INSERT INTO users 
@@ -64,7 +59,6 @@ export const providerSignup = async (req, res) => {
     );
 
     const user_id = result.rows[0].id;
-    const imageName = req.file ? req.file.filename : null;
     let latitude = null;
     let longitude = null;
 
@@ -73,29 +67,32 @@ export const providerSignup = async (req, res) => {
       latitude = location.latitude;
       longitude = location.longitude;
     }
-    const insertIntoProvider = await pool.query(
-      `INSERT INTO service_provider_info 
-       (user_id, name, contact, address, about, image_url, category, price, latitude, longitude, experience_years, business_name)
-       VALUES ($1,$2,$3,$4 , $5, $6, $7, $8, $9, $10, $11, $12)
+
+    const insertIntoCustomers = await pool.query(
+      `INSERT INTO customer_info 
+       (user_id, name, contact, address, latitude, longitude)
+       VALUES ($1,$2,$3,$4 , $5, $6)
        RETURNING user_id`,
-      [
-        user_id,
-        fullname,
-        phone,
-        address,
-        description,
-        imageName,
-        category,
-        price,
-        latitude,
-        longitude,
-        experience,
-        business_name,
-      ],
+      [user_id, fullname, phone, address, latitude, longitude],
     );
 
+    const token = jwt.sign(
+      {
+        id: user_id,
+        role: role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
     res.status(201).json({
-      message: "Provider signup successful",
+      message: "Customer Sign up sucessfull",
     });
   } catch (err) {
     console.error(err);
