@@ -1,16 +1,14 @@
 import GetLocation from "../../../Utils/GetLocation.js";
-import { useState, useEffect , useRef} from "react";
-import axios from "axios";
+import { useState, useEffect, useRef } from "react";
+import axios from "../../../api/axios";
 import CloseIcon from "@mui/icons-material/Close";
+import { motion } from "framer-motion";
 
 function CustomerSignup() {
   const [location, setLocation] = useState(null);
-  const [locationText, setLocationText] = useState("Get Location");
-  const [locationBtnBorder, setLocationBtnBorder] = useState(
-    "2px solid rgb(86, 189, 230)",
-  );
+  const [locationText, setLocationText] = useState("Get My Location");
   const [isAlertDisplay, setAlertDisplay] = useState("none");
-  const [signupMessage, setSignupMessage] = useState("none");
+  const [signupMessage, setSignupMessage] = useState("");
   const [alertColor, setAlertColor] = useState("");
   const [formData, setFormData] = useState({
     fullname: "",
@@ -24,30 +22,30 @@ function CustomerSignup() {
 
   const [errors, setErrors] = useState({});
   const usernameErr = useRef(null);
-  const passowordErr = useRef(null)
-  const confirmPassowordErr = useRef(null)
+  const passwordErr = useRef(null)
+  const confirmPasswordErr = useRef(null)
   const emailErr = useRef(null)
   const phoneErr = useRef(null)
   const noLocation = useRef(null)
 
-  const scrollToElement = (ref)=>{
-    if(ref && ref.current){
+  const scrollToElement = (ref) => {
+    if (ref && ref.current) {
       ref.current.scrollIntoView({
-      behavior : "smooth",
-      block : "start"
-    })
+        behavior: "smooth",
+        block: "start"
+      })
     }
   }
 
   useEffect(() => {
-    if (isAlertDisplay == "flex") {
+    if (isAlertDisplay === "flex") {
       const signupAlertTimeout = setTimeout(() => {
         setAlertDisplay("none");
       }, 4000);
 
       return () => clearTimeout(signupAlertTimeout);
     }
-  }, [isAlertDisplay == "flex"]);
+  }, [isAlertDisplay]);
 
   const handleCustomerFormDataChange = (e) => {
     setFormData({
@@ -60,10 +58,9 @@ function CustomerSignup() {
     try {
       const loc = await GetLocation();
       setLocation(loc);
-      setLocationText("Location Obtained");
-      setLocationBtnBorder("2px solid green");
+      setLocationText("Location Secured");
     } catch (error) {
-      alert("Cannot fetch your location");
+      alert("Cannot fetch your location. Please check browser permissions.");
     }
   };
 
@@ -72,33 +69,32 @@ function CustomerSignup() {
 
     if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-      scrollToElement(passowordErr)
+      scrollToElement(passwordErr)
       setErrors(newErrors)
       return false;
     }
 
-    if (formData.password != formData.confirmPassword) {
-      newErrors.confirmPassword = "Password should match";
-      scrollToElement(confirmPassowordErr)
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      scrollToElement(confirmPasswordErr)
       setErrors(newErrors)
       return false;
     }
-    if(!location){
-      newErrors.location = "Location required";
+    if (!location) {
+      newErrors.location = "Location required for setup";
       scrollToElement(noLocation)
       setErrors(newErrors)
       return false;
     }
 
     setErrors(newErrors);
-    // return true if newErrors is empty
     return true;
   };
 
   const handleCustomerFormSubmit = async (e) => {
     e.preventDefault();
 
-    if(!validateForm()){
+    if (!validateForm()) {
       return;
     }
 
@@ -115,7 +111,7 @@ function CustomerSignup() {
     }
 
     try {
-      const response = await axios.post("/api/CustomerSignup", data);
+      await axios.post("/CustomerSignup", formData);
       setFormData({
         fullname: "",
         username: "",
@@ -125,195 +121,192 @@ function CustomerSignup() {
         phone: "",
         address: "",
       });
-      data.append("location", null);
       setAlertDisplay("flex");
-      setSignupMessage("Signup successful, Log in now");
-      setAlertColor("rgb(86, 189, 230)");
-      setLocationBtnBorder("2px solid rgb(86, 189, 230)");
-      setLocationText("Get Location");
+      setSignupMessage("Welcome! Registration successful.");
+      setAlertColor("var(--primary)");
+      setLocation(null);
+      setLocationText("Get My Location");
     } catch (err) {
-  let field;
+      let field;
+      if (err.response && err.response.data) {
+        field = err.response.data.field;
+      }
 
-  if (err.response && err.response.data) {
-    field = err.response.data.field;
-  }
-
-  let newErrors = {};
-
-  if (field === "username") {
-    newErrors.username = "Username already exists";
-    scrollToElement(usernameErr);
-  } 
-  else if (field === "email") {
-    newErrors.email = "Please provide a different email";
-    scrollToElement(emailErr);
-  } 
-  else if (field === "phone") {
-    newErrors.phone = "Please provide different mobile number";
-    scrollToElement(phoneErr);
-  }
-
-  setErrors(newErrors);
-}
+      let newErrors = {};
+      if (field === "username") {
+        newErrors.username = "Username already exists";
+        scrollToElement(usernameErr);
+      }
+      else if (field === "email") {
+        newErrors.email = "Email is already registered";
+        scrollToElement(emailErr);
+      }
+      else if (field === "phone") {
+        newErrors.phone = "Phone number already in use";
+        scrollToElement(phoneErr);
+      }
+      setErrors(newErrors);
+    }
   };
 
   return (
     <div className="signup-container">
-      <div className="signup-form-container">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="signup-form-container"
+      >
         <form onSubmit={handleCustomerFormSubmit} className="provider-signup">
           <div className="top-heading">
-            <h2 className="provider-signup-heading">Customer Sign Up</h2>
-            <p>Fill in your details to get started.</p>
+            <h2>Customer Sign Up</h2>
+            <p>Join Servease to access premium services.</p>
           </div>
+          
           <div className="signup-form-element">
             <label htmlFor="fullname" className="signup-form-label">
-              Full Name<span style={{ color: "red" }}>*</span>
+              Full Name
             </label>
             <input
               type="text"
               name="fullname"
-              placeholder="Enter full name"
+              placeholder="e.g. John Doe"
               id="fullname"
               value={formData.fullname}
               required
               onChange={handleCustomerFormDataChange}
             />
           </div>
+
           <div className="signup-form-element">
             <label htmlFor="username" className="signup-form-label" ref={usernameErr}>
-              Username<span style={{ color: "red" }}>*</span>
+              Username
             </label>
             <input
               type="text"
               name="username"
-              placeholder="Enter username"
+              placeholder="Choose a username"
               id="username"
               value={formData.username}
               required
               onChange={handleCustomerFormDataChange}
             />
+            {errors.username && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.username}</span>}
           </div>
-          {errors.username && <p style={{color:"red"}}>{errors.username}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="password" className="signup-form-label">
-              Password<span style={{ color: "red" }}>*</span>
+            <label htmlFor="password" className="signup-form-label" ref={passwordErr}>
+              Password
             </label>
             <input
               type="password"
               name="password"
-              placeholder="Enter password"
-              id="passoword"
+              placeholder="At least 6 characters"
+              id="password"
               value={formData.password}
               required
               onChange={handleCustomerFormDataChange}
-              ref={passowordErr}
             />
+            {errors.password && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.password}</span>}
           </div>
-          {errors.password && <p style={{color:"red"}}>{errors.password}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="confirmPassword" className="signup-form-label" ref = {confirmPassowordErr}>
-              Confirm Password<span style={{ color: "red" }}>*</span>
+            <label htmlFor="confirmPassword" className="signup-form-label" ref={confirmPasswordErr}>
+              Confirm Password
             </label>
             <input
               type="password"
               name="confirmPassword"
-              placeholder="Confirm password"
-              id="confirmPassoword"
+              placeholder="Repeat your password"
+              id="confirmPassword"
               value={formData.confirmPassword}
               required
               onChange={handleCustomerFormDataChange}
             />
+            {errors.confirmPassword && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.confirmPassword}</span>}
           </div>
-          {errors.confirmPassword && <p style={{color:"red"}}>{errors.confirmPassword}</p>}
+
           <div className="signup-form-element">
             <label htmlFor="email" className="signup-form-label" ref={emailErr}>
-              Email<span style={{ color: "red" }}>*</span>
+              Email Address
             </label>
             <input
               name="email"
               type="email"
-              placeholder="Enter email"
+              placeholder="john@example.com"
               id="email"
               value={formData.email}
               required
               onChange={handleCustomerFormDataChange}
             />
+            {errors.email && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.email}</span>}
           </div>
-          {errors.email && <p style={{color:"red"}}>{errors.email}</p>}
+
           <div className="signup-form-element">
             <label htmlFor="contact-number" className="signup-form-label" ref={phoneErr}>
-              Phone Number<span style={{ color: "red" }}>*</span>
+              Phone Number
             </label>
             <input
               type="tel"
               name="phone"
               pattern="[0-9]{10}"
-              placeholder="Enter phone number"
+              placeholder="10-digit mobile number"
               id="contact-number"
               value={formData.phone}
               onChange={handleCustomerFormDataChange}
               required
             />
+            {errors.phone && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.phone}</span>}
           </div>
-          {errors.phone && <p style={{color:"red"}}>{errors.phone}</p>}
+
           <div className="signup-form-element-textarea">
-            <label
-              htmlFor="address"
-              name="address"
-              className="signup-form-label"
-            >
-              Address<span style={{ color: "red" }}>*</span>
+            <label htmlFor="address" className="signup-form-label">
+              Detailed Address
             </label>
             <textarea
               name="address"
               id="address"
-              placeholder="Enter address"
-              className="hoverEffect focusEffect"
+              placeholder="Enter your complete home address"
               value={formData.address}
               required
               onChange={handleCustomerFormDataChange}
             ></textarea>
           </div>
+
           <div className="signup-form-element" ref={noLocation}>
             <div className="location-label">
-              <label htmlFor="user-location" className="signup-form-label">
-                Provide Location
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              
-              <p className="location-text">
-                (Provide location for better visibility)
-              </p>
+              <label className="signup-form-label">Device Location</label>
+              <p className="location-text">Required for finding nearby service providers</p>
             </div>
 
             <div className="location-btn-container">
               <button
-                className="location-btn hoverEffect"
+                className="location-btn"
                 type="button"
                 onClick={handleLocation}
-                style={{ border: locationBtnBorder }}
+                style={{ 
+                  borderColor: location ? 'var(--primary)' : 'var(--border)',
+                  color: location ? 'var(--primary)' : 'var(--text-muted)'
+                }}
               >
                 {locationText}
               </button>
-
             </div>
+            {errors.location && <span className="error-text" style={{color: 'red', fontSize: '0.8rem'}}>{errors.location}</span>}
+          </div>
 
-          </div>
-          {errors.location && <p style={{color:"red"}}>{errors.location}</p>}
-          <div className="upload-img">
-            <button type="submit" className="signup-submit-btn">
-              Submit
-            </button>
-          </div>
+          <button type="submit" className="signup-submit-btn">
+            Create Account
+          </button>
         </form>
+
         <div
           className="alert-signup"
           style={{ display: isAlertDisplay, background: alertColor }}
         >
-          {signupMessage}
-          <CloseIcon className="signup-close" />
+          <span>{signupMessage}</span>
+          <CloseIcon className="signup-close" onClick={() => setAlertDisplay("none")} />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

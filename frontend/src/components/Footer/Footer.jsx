@@ -4,48 +4,58 @@ import './Footer.css'
 
 function Footer() {
   return (
-    <div className="footer">
-      
-      <div className="footer-container">
-        <Link to='/' className="logo-link">
-        <div className="logo-container footer-child">
-          
-          <img src={logo} alt="logo" />
-          <span className="logo">SERVEASE</span>
-           
+    <footer className="footer-premium">
+      <div className="footer-container max-width">
+        <div className="footer-brand">
+          <Link to='/' className="footer-logo">
+            <img src={logo} alt="logo" />
+            <span className="logo-text">SERVEASE</span>
+          </Link>
+          <p className="footer-tagline">
+            Providing premium home services that you can trust. Our verified professionals are ready to help.
+          </p>
         </div>
-        </Link>
         
-        <div className="services-section footer-child">
-          <span><h2>Our Services</h2></span>          
-          <span>Cleaning</span>          
-          <span>Repairs</span>          
-          <span>Plumbing</span>                    
-          <span >
-            <select name="footer-services" className="select-option" id="footer-services">
-              <option value="shifting">Shifting</option>
-              <option value="painting">Painting</option>
-              <option value="electrical">Electrical</option>
-              <option value="gardening">Gardening</option>
-              <option value="carwash">Carwash</option>
-            </select>  
-          </span>                     
-        </div>
-        <div className="footer-links footer-child">
-          <span><h2>Quick Links</h2></span>          
-          <span><Link to='/' className="quick-link">Home</Link></span>           
-          <span><Link to='/services' className="quick-link">Services</Link></span>           
-          <span><Link to='/about' className="quick-link">About</Link></span>           
-        </div>
-        <div className="footer-contact footer-child">
-          <span><h2>Support</h2></span>          
-          <span>Contact Us</span>          
-          <span>support@servease.com</span>          
-          <span>+918218788163</span>          
+        <div className="footer-links-grid">
+          <div className="footer-column">
+            <h4>Services</h4>
+            <ul>
+              <li><Link to="/Services/Cleaning">Cleaning</Link></li>
+              <li><Link to="/Services/Repair">Repairs</Link></li>
+              <li><Link to="/Services/Plumbing">Plumbing</Link></li>
+              <li><Link to="/Services/Electrical">Electrical</Link></li>
+            </ul>
+          </div>
+          
+          <div className="footer-column">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><Link to='/'>Home</Link></li>
+              <li><Link to='/Services/Popular'>Services</Link></li>
+              <li><Link to='/About'>About Us</Link></li>
+            </ul>
+          </div>
+          
+          <div className="footer-column">
+             <h4>Support</h4>
+             <ul className="support-list">
+               <li><a href="mailto:support@servease.com">support@servease.com</a></li>
+               <li><a href="tel:+918218788163">+91 82187 88163</a></li>
+               <li>Srinagar, Uttarakhand</li>
+             </ul>
+          </div>
         </div>
       </div>
-      <div className="copy-right">&copy; 2026 Servease. All rights reserved.</div>
-    </div>
+      
+      <div className="footer-bottom">
+        <div className="max-width bottom-content">
+          <p>&copy; {new Date().getFullYear()} Servease. All rights reserved.</p>
+          <div className="social-links">
+            {/* Social icons could go here */}
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 

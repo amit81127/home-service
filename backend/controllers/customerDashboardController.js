@@ -1,29 +1,16 @@
-// if(user.role == 'customer'){
-//     userResult = await pool.query(
-//         `SELECT
-//                 u.id,
-//                 u.role,
-//                 u.username,
-//                 u.email,
-//                 p.user_id,
-//                 p.name,
-//                 p.address,
-//                 p.latitude,
-//                 p.longitude
-//             FROM users u
-//             JOIN customer_info p
-//             ON u.id = p.user_id
-//             WHERE u.id = $1
-//             ;`,
-//         [user.id],
-//       )
-//   }
+import User from "../models/User.js";
 
-//    let userResult;
-//     delete userResult.password;
-
-export function customerDashboard(req, res){
-    return res.status(200).json({
-        message: "Customer Dashboard"
-    })
+export async function customerDashboard(req, res){
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({
+            user: user
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
 }

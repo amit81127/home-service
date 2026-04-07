@@ -3,20 +3,16 @@ import "../Signup.css"
 import GetLocation from "../../../Utils/GetLocation.js";
 import { compressImage } from "../../../Utils/CompressImage.js";
 import { useState, useEffect , useRef} from "react";
-import axios from "axios";
+import axios from "../../../api/axios";
 import CloseIcon from "@mui/icons-material/Close";
+import { motion } from "framer-motion";
 
 function ProviderSignup() {
   const [location, setLocation] = useState(null);
-  const [locationText, setLocationText] = useState("Get Location");
-  const [locationErr, setlocationErr] = useState("");
-  const [locationBtnBorder, setLocationBtnBorder] = useState(
-    "2px solid rgb(86, 189, 230)",
-  );
-  const [imgBorder, setImgBorder] = useState("2px solid rgb(86, 189, 230)");
+  const [locationText, setLocationText] = useState("Get Business Location");
   const [compressedImage, setCompressedImage] = useState(null);
   const [isAlertDisplay, setAlertDisplay] = useState("none");
-  const [signupMessage, setSignupMessage] = useState("none");
+  const [signupMessage, setSignupMessage] = useState("");
   const [alertColor, setAlertColor] = useState("");
   const [formData, setFormData] = useState({
     fullname: "",
@@ -35,8 +31,8 @@ function ProviderSignup() {
 
   const [errors, setErrors] = useState({});
   const usernameErr = useRef(null);
-  const passowordErr = useRef(null)
-  const confirmPassowordErr = useRef(null)
+  const passwordErr = useRef(null)
+  const confirmPasswordErr = useRef(null)
   const priceErr = useRef(null)
   const emailErr = useRef(null)
   const phoneErr = useRef(null)
@@ -45,21 +41,21 @@ function ProviderSignup() {
   const scrollToElement = (ref)=>{
     if(ref && ref.current){
       ref.current.scrollIntoView({
-      behavior : "smooth",
-      block : "start"
-    })
+        behavior : "smooth",
+        block : "start"
+      })
     }
   }
 
   useEffect(() => {
-    if (isAlertDisplay == "flex") {
+    if (isAlertDisplay === "flex") {
       const signupAlertTimeout = setTimeout(() => {
         setAlertDisplay("none");
       }, 4000);
 
       return () => clearTimeout(signupAlertTimeout);
     }
-  }, [isAlertDisplay == "flex"]);
+  }, [isAlertDisplay]);
 
   const handleProviderFormDataChange = (e) => {
     setFormData({
@@ -70,14 +66,11 @@ function ProviderSignup() {
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     try {
       const compressed = await compressImage(file);
       setCompressedImage(compressed);
-      setImgBorder("2px solid green");
     } catch (err) {
       console.error("Compression error:", err);
     }
@@ -87,11 +80,9 @@ function ProviderSignup() {
     try {
       const loc = await GetLocation();
       setLocation(loc);
-      setLocationText("Location Obtained");
-      setLocationBtnBorder("2px solid green");
+      setLocationText("Location Secured");
     } catch (error) {
-      setlocationErr(error);
-      alert("Cannot fetch your location");
+      alert("Cannot fetch your location. Please check browser permissions.");
     }
   };
 
@@ -99,68 +90,49 @@ function ProviderSignup() {
     let newErrors = {};
 
     if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      scrollToElement(passowordErr)
+      newErrors.password = "Minimum 6 characters required";
+      scrollToElement(passwordErr)
       setErrors(newErrors)
       return false;
     }
 
-    if (formData.password != formData.confirmPassword) {
-      newErrors.confirmPassword = "Password should match";
-      scrollToElement(confirmPassowordErr)
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      scrollToElement(confirmPasswordErr)
       setErrors(newErrors)
       return false;
     }
 
     if (!formData.price || formData.price <= 0) {
-      newErrors.price = "Enter valid price";
+      newErrors.price = "Please set a valid price";
       scrollToElement(priceErr)
       setErrors(newErrors)
       return false;
     }
 
     if(!location){
-      newErrors.location = "Location required";
+      newErrors.location = "Business location is required";
       scrollToElement(noLocation)
       setErrors(newErrors)
       return false;
     }
 
     setErrors(newErrors);
-    // return true if newErrors is empty
     return true;
   };
 
   const handleProviderFormSubmit = async (e) => {
     e.preventDefault();
 
-    if(!validateForm()){
-      return;
-    }
+    if(!validateForm()) return;
 
     const data = new FormData();
-    data.append("fullname", formData.fullname);
-    data.append("username", formData.username);
-    data.append("password", formData.password);
-    data.append("email", formData.email);
-    data.append("phone", formData.phone);
-    data.append("category", formData.category);
-    data.append("experience", formData.experience);
-    data.append("address", formData.address);
-    data.append("description", formData.description);
-    data.append("price", formData.price);
-    data.append("business_name", formData.business_name);
-
-    if (location) {
-      data.append("location", JSON.stringify(location));
-    }
-
-    if (compressedImage) {
-      data.append("image", compressedImage);
-    }
+    Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    if (location) data.append("location", JSON.stringify(location));
+    if (compressedImage) data.append("image", compressedImage);
 
     try {
-      const response = await axios.post("/api/providerSignup", data);
+      await axios.post("/api/providerSignup", data);
       setFormData({
         fullname: "",
         username: "",
@@ -175,167 +147,155 @@ function ProviderSignup() {
         price: "",
         business_name: "",
       });
-      data.append("location", null);
-      data.append("image", null);
       setCompressedImage(null);
-      setImgBorder("2px solid rgb(86, 189, 230)");
       setAlertDisplay("flex");
-      setSignupMessage("Signup successful, Log in now");
-      setAlertColor("rgb(86, 189, 230)");
-      setLocationBtnBorder("2px solid rgb(86, 189, 230)");
-      setLocationText("Get Location");
+      setSignupMessage("Welcome! Your provider account is ready.");
+      setAlertColor("var(--primary)");
+      setLocation(null);
+      setLocationText("Get Business Location");
     } catch (err) {
-  let field;
+      let field;
+      if (err.response && err.response.data) {
+        field = err.response.data.field;
+      }
 
-  if (err.response && err.response.data) {
-    field = err.response.data.field;
-  }
-
-  let newErrors = {};
-
-  if (field === "username") {
-    newErrors.username = "Username already exists";
-    scrollToElement(usernameErr);
-  } 
-  else if (field === "email") {
-    newErrors.email = "Please provide a different email";
-    scrollToElement(emailErr);
-  } 
-  else if (field === "phone") {
-    newErrors.phone = "Please provide different mobile number";
-    scrollToElement(phoneErr);
-  }
-
-  setErrors(newErrors);
-}
+      let newErrors = {};
+      if (field === "username") {
+        newErrors.username = "Username already exists";
+        scrollToElement(usernameErr);
+      } 
+      else if (field === "email") {
+        newErrors.email = "Email is already registered";
+        scrollToElement(emailErr);
+      } 
+      else if (field === "phone") {
+        newErrors.phone = "Phone number already in use";
+        scrollToElement(phoneErr);
+      }
+      setErrors(newErrors);
+    }
   };
 
   return (
     <div className="signup-container">
-      <div className="signup-form-container">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="signup-form-container"
+      >
         <form onSubmit={handleProviderFormSubmit} className="provider-signup">
           <div className="top-heading">
-            <h2 className="provider-signup-heading">Provider Sign Up</h2>
-            <p>Fill in your details to get started.</p>
+            <h2>Provider Sign Up</h2>
+            <p>Ready to showcase your skills? Register now.</p>
           </div>
+
           <div className="signup-form-element">
-            <label htmlFor="fullname" className="signup-form-label">
-              Full Name<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="fullname" className="signup-form-label">Full Name</label>
             <input
               type="text"
               name="fullname"
-              placeholder="Enter full name"
+              placeholder="e.g. Michael Smith"
               id="fullname"
               value={formData.fullname}
               required
               onChange={handleProviderFormDataChange}
             />
           </div>
+
           <div className="signup-form-element">
-            <label htmlFor="businessName" className="signup-form-label">
-              Business Name<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="business_name" className="signup-form-label">Business Name</label>
             <input
               type="text"
               name="business_name"
-              placeholder="Enter your business name"
-              id="businessname"
+              placeholder="e.g. Smith & Sons Plumbing"
+              id="business_name"
               value={formData.business_name}
               required
               onChange={handleProviderFormDataChange}
             />
           </div>
+
           <div className="signup-form-element">
-            <label htmlFor="username" className="signup-form-label" ref={usernameErr}>
-              Username<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="username" className="signup-form-label" ref={usernameErr}>Username</label>
             <input
               type="text"
               name="username"
-              placeholder="Enter username"
+              placeholder="Choose a professional handle"
               id="username"
               value={formData.username}
               required
               onChange={handleProviderFormDataChange}
             />
+            {errors.username && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.username}</span>}
           </div>
-          {errors.username && <p style={{color:"red"}}>{errors.username}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="password" className="signup-form-label">
-              Password<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="password" className="signup-form-label" ref={passwordErr}>Password</label>
             <input
               type="password"
               name="password"
-              placeholder="Enter password"
-              id="passoword"
+              placeholder="At least 6 characters"
+              id="password"
               value={formData.password}
               required
               onChange={handleProviderFormDataChange}
-              ref={passowordErr}
             />
+            {errors.password && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.password}</span>}
           </div>
-          {errors.password && <p style={{color:"red"}}>{errors.password}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="confirmPassword" className="signup-form-label" ref = {confirmPassowordErr}>
-              Confirm Password<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="confirmPassword" className="signup-form-label" ref={confirmPasswordErr}>Confirm Password</label>
             <input
               type="password"
               name="confirmPassword"
-              placeholder="Confirm password"
-              id="confirmPassoword"
+              placeholder="Repeat your password"
+              id="confirmPassword"
               value={formData.confirmPassword}
               required
               onChange={handleProviderFormDataChange}
             />
+            {errors.confirmPassword && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.confirmPassword}</span>}
           </div>
-          {errors.confirmPassword && <p style={{color:"red"}}>{errors.confirmPassword}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="email" className="signup-form-label" ref={emailErr}>
-              Email<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="email" className="signup-form-label" ref={emailErr}>Email Address</label>
             <input
               name="email"
               type="email"
-              placeholder="Enter email"
+              placeholder="mike@business.com"
               id="email"
               value={formData.email}
               required
               onChange={handleProviderFormDataChange}
             />
+            {errors.email && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.email}</span>}
           </div>
-          {errors.email && <p style={{color:"red"}}>{errors.email}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="contact-number" className="signup-form-label" ref={phoneErr}>
-              Phone Number<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="phone" className="signup-form-label" ref={phoneErr}>Phone Number</label>
             <input
               type="tel"
               name="phone"
               pattern="[0-9]{10}"
-              placeholder="Enter phone number"
-              id="contact-number"
+              placeholder="10-digit mobile number"
+              id="phone"
               value={formData.phone}
               onChange={handleProviderFormDataChange}
               required
             />
+            {errors.phone && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.phone}</span>}
           </div>
-          {errors.phone && <p style={{color:"red"}}>{errors.phone}</p>}
+
           <div className="signup-form-element">
-            <label htmlFor="category" className="signup-form-label">
-              Choose Category<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="category" className="signup-form-label">Service Category</label>
             <select
               name="category"
               id="category"
-              className="choose-category"
               value={formData.category}
               required
               onChange={handleProviderFormDataChange}
             >
-              <option value="">Choose Category</option>
+              <option value="">Select your specialty</option>
               <option value="Cleaning">Cleaning</option>
               <option value="Repair">Repair</option>
               <option value="Plumbing">Plumbing</option>
@@ -346,128 +306,112 @@ function ProviderSignup() {
               <option value="Carwash">Car Wash</option>
             </select>
           </div>
+
           <div className="signup-form-element">
-            <label htmlFor="experience" className="signup-form-label">
-              Experience
-            </label>
+            <label htmlFor="experience" className="signup-form-label">Years of Experience</label>
             <select
-            className="choose-category"
               name="experience"
               id="experience"
               value={formData.experience}
               required
               onChange={handleProviderFormDataChange}
             >
-              <option value="">Experience in years</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">More than 4</option>
+              <option value="">How long have you been working?</option>
+              <option value="1">1 Year</option>
+              <option value="2">2 Years</option>
+              <option value="3">3 Years</option>
+              <option value="4">4 Years</option>
+              <option value="5">5+ Years</option>
             </select>
           </div>
+
           <div className="signup-form-element-textarea">
-            <label
-              htmlFor="address"
-              name="address"
-              className="signup-form-label"
-            >
-              Address<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="address" className="signup-form-label">Business Address</label>
             <textarea
               name="address"
               id="address"
-              placeholder="Enter address"
-              className="hoverEffect focusEffect"
+              placeholder="Full address of your base/office"
               value={formData.address}
               required
               onChange={handleProviderFormDataChange}
             ></textarea>
           </div>
+
           <div className="signup-form-element-textarea">
-            <label htmlFor="provider-about" className="signup-form-label">
-              Description<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="description" className="signup-form-label">Service Description</label>
             <textarea
               name="description"
-              id="provider-about"
-              placeholder="Complete description about your services"
-              className="hoverEffect focusEffect"
+              id="description"
+              placeholder="Tell customers what makes your service great..."
               value={formData.description}
               required
               onChange={handleProviderFormDataChange}
+              style={{height: '150px'}}
             ></textarea>
           </div>
+
           <div className="signup-form-element">
-            <label htmlFor="price" className="signup-form-label">
-              Service Price<span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="price" className="signup-form-label" ref={priceErr}>Base Rate (₹/hr)</label>
             <input
               type="number"
               name="price"
-              placeholder="Enter according to per hour"
+              placeholder="e.g. 500"
               id="price"
               value={formData.price}
               required
               onChange={handleProviderFormDataChange}
-              ref={priceErr}
             />
+            {errors.price && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.price}</span>}
           </div>
-          {errors.price && <p style={{color:"red"}}>{errors.price}</p>}
-          <div className="signup-form-element">
-            <div className="location-label">
-              <label htmlFor="user-location" className="signup-form-label">
-                Provide Location
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              
-              <p className="location-text">
-                (Provide location for better visibility)
-              </p>
-            </div>
 
+          <div className="signup-form-element" ref={noLocation}>
+            <div className="location-label">
+              <label className="signup-form-label">Business Location</label>
+              <p className="location-text">Required for being discoverable in search results</p>
+            </div>
             <div className="location-btn-container">
               <button
-                className="location-btn hoverEffect"
+                className="location-btn"
                 type="button"
                 onClick={handleLocation}
-                style={{ border: locationBtnBorder }}
-                ref={noLocation}
+                style={{ 
+                  borderColor: location ? 'var(--primary)' : 'var(--border)',
+                  color: location ? 'var(--primary)' : 'var(--text-muted)'
+                }}
               >
                 {locationText}
               </button>
-
             </div>
+            {errors.location && <span style={{color: "red", fontSize: "0.8rem"}}>{errors.location}</span>}
+          </div>
 
-          </div>
-          {errors.location && <p style={{color:"red"}}>{errors.location}</p>}
           <div className="signup-form-element">
-            <label htmlFor="imgUpload" className="signup-form-label">
-              Upload Image
-            </label>
-            <input
-              type="file"
-              accept="image/png"
-              onChange={handleUpload}
-              style={{ border: imgBorder }}
-              className="img-input"
-              required
-            />
+            <label className="signup-form-label">Showcase Image</label>
+            <div className="img-input-wrapper" style={{ borderColor: compressedImage ? 'var(--primary)' : 'var(--border)' }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleUpload}
+                className="img-input"
+                required
+              />
+              <p style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                {compressedImage ? "✓ Image selected and optimized" : "Upload a photo of your work or business logo"}
+              </p>
+            </div>
           </div>
-          <div className="upload-img">
-            <button type="submit" className="signup-submit-btn">
-              Submit
-            </button>
-          </div>
+
+          <button type="submit" className="signup-submit-btn">Register as Provider</button>
         </form>
+
         <div
           className="alert-signup"
           style={{ display: isAlertDisplay, background: alertColor }}
         >
-          {signupMessage}
-          <CloseIcon className="signup-close" />
+          <span>{signupMessage}</span>
+          <CloseIcon className="signup-close" onClick={() => setAlertDisplay("none")} />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import "./Home.css";
-import axios from "axios";
+import { motion } from "framer-motion";
+import axios from "../../api/axios";
 import Navbar from "../../components/Navbar/Navbar";
 import { useEffect, useState, useRef } from "react";
 import Searchbar from "../../components/Searchbar/Searchbar.jsx";
@@ -7,100 +7,105 @@ import CategoryList from "../../components/CategoryList/CategoryList";
 import Footer from "../../components/Footer/Footer";
 import Typewriter from "typewriter-effect";
 import ServiceProviderList from "../../components/ServiceProviderList/ServiceProviderList";
+import "./Home.css";
 
 function Home() {
   const [categories, setCategories] = useState([]);
   const [providerInfo, setProviderInfo] = useState([]);
   const [category, setCategory] = useState("Popular");
-  const serviceRef = useRef("null");
-
-  const scroolToServices = () => {
-    serviceRef.current.scrollIntoView({
-      behavior: "smooth",
-    });
-  };
+  const serviceRef = useRef(null);
 
   useEffect(() => {
+    const getCategoriesList = async () => {
+      try {
+        const res = await axios.get("/categories");
+        setCategories(res.data);
+      } catch (err) {
+        console.error("Categories error:", err);
+      }
+    };
     getCategoriesList();
   }, []);
 
   useEffect(() => {
-    getProviderInfo(category);
+    const getProviderInfo = async () => {
+      try {
+        const res = await axios.get(`/serviceProviderinfo?category=${category}`);
+        setProviderInfo(res.data);
+      } catch (err) {
+        console.error("Providers error:", err);
+      }
+    };
+    getProviderInfo();
   }, [category]);
 
-  const getCategoriesList = () => {
-    axios
-      .get("/api/categories")
-      .then((res) => setCategories(res.data))
-      .catch((err) => console.log("error"));
-  };
-
-  const getProviderInfo = (category) => {
-    axios
-      .get(`/api/serviceProviderinfo?category=${category}`)
-      .then((res) => setProviderInfo(res.data))
-      .catch((err) => console.log("error"));
-  };
-
   return (
-    <>
-      <Navbar></Navbar>
+    <div className="home-wrapper">
+      <Navbar />
+      
       <section className="hero-section">
-        <div className="hero-section-container">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="hero-section-container"
+        >
           <div className="hero">
-            <h2 className="headline">
-              <div className="headline-first">
-                <span className="headline-top-container">
-                  <span>Trusted </span>
-                  <span className="blue">
-                    <span>Home </span>
-                    <span>Services</span>
-                  </span>
-                </span>
-                <span> At</span>
-              </div>
-              <div>
-                <span className="second-headline">
-                  {" "}
-                  <span>Your </span>
-                  <span>Fingertips</span>
-                </span>
-              </div>
-            </h2>
-            <h2 className="subheadline">
-              Find best home services <span className="slash-container">/</span><span>repairs near you</span>
-            </h2>
+            <h1 className="headline">
+              Trusted <span className="blue">Home Services</span> <br />
+              At Your Fingertips
+            </h1>
+            <p className="subheadline">
+              Expert repairs, cleaning, and maintenance services delivered by verified professionals right at your doorstep.
+            </p>
           </div>
-          <Searchbar ref={serviceRef} />
-        </div>
-        <div className="type-writer-container">
-          <div className="type-writer">
-          <span>Avaliable at </span>
-          <span className="type-writer-text">
-            <Typewriter
-              style={{ color: "var(--primary-color) !important" }}
-              options={{
-                strings: ["Srinagar", "Chauras", "Srikot", "Kirtinagar"],
-                autoStart: true,
-                loop: true,
-                pauseFor: 3000,
-              }}
-              className="type-writer-txt"
-            />
-          </span>
-        </div>
-        </div>
+          
+          <Searchbar />
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 1 }}
+            className="type-writer-container"
+          >
+            <span>Available at </span>
+            <span className="type-writer-text">
+              <Typewriter
+                options={{
+                  strings: ["Srinagar", "Chauras", "Srikot", "Kirtinagar"],
+                  autoStart: true,
+                  loop: true,
+                  pauseFor: 3000,
+                }}
+              />
+            </span>
+          </motion.div>
+        </motion.div>
       </section>
+
       <CategoryList categoryList={categories} />
-      <h2 style={{ fontWeight: "500", marginTop: "20px", padding: "0 10px" }}>
-        {category} Providers
-      </h2>
-      <ServiceProviderList
-        providerInfo={providerInfo}
-        currentCategory={category}
-      />
+      
+      <div className="providers-section max-width">
+        <div className="section-header">
+          <motion.h2 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+             Best {category} Providers
+          </motion.h2>
+          <p className="section-tagline">Showing top-rated professionals in your area</p>
+        </div>
+        
+        <ServiceProviderList
+          providerInfo={providerInfo}
+          currentCategory={category}
+          text={`No ${category} providers found at the moment.`}
+        />
+      </div>
+      
       <Footer />
-    </>
+    </div>
   );
 }
 

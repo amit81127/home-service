@@ -1,42 +1,58 @@
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from '../../components/Footer/Footer'
+import { motion } from "framer-motion";
 import './About.css'
 
-
 function About() {
+  const containerHeader = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
+
+  const sectionVariant = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.2 } }
+  };
+
   return (
     <>
       <Navbar />
       <div className="about-page">
-        <h1>About Us</h1>
-        <p>
-          Servease is a modern home service booking platform built to simplify everyday living. We connect customers with trusted and verified professionals for a wide range of household services — all through a seamless digital experience. In today’s fast-paced world, finding reliable service providers can be time-consuming and uncertain. Servease eliminates that hassle by offering a centralized platform where quality, safety, and convenience come together. Whether it’s urgent repairs or routine maintenance, we ensure that help is always just a few clicks away.
-        </p>
-        <h2>Our Mission</h2>
-        <p>
-          Our mission is to simplify home maintenance by creating a seamless and reliable digital platform where customers can easily book trusted professionals anytime, anywhere. We aim to eliminate the stress of searching for skilled service providers by ensuring quality, transparency, and timely service delivery. Through technology and efficient service management, we strive to provide a smooth booking experience, fair pricing, and dependable customer support that builds long-term trust with our users.
-        </p>
-        <h2>What We Offer</h2>
-          <ul className="list-items">
-            <li>Easy Online Booking</li>
-            <li>Compare providers online</li>
-            <li>Transparent Princing</li>
-            <li>Smart Provider Matching</li>
-            <li>Multiple Service Category</li>
-          </ul>
+        <motion.h1 initial="hidden" animate="visible" variants={containerHeader}>
+          Our Story
+        </motion.h1>
+        
+        <motion.section initial="hidden" animate="visible" variants={sectionVariant} className="about-section">
+          <p>
+            Servease is a premium home service ecosystem designed to redefine how you manage your living space. We bridge the gap between discerning homeowners and elite service professionals through a sophisticated digital interface. In a world where time is the ultimate luxury, Servease delivers reliability, transparency, and excellence directly to your doorstep.
+          </p>
+        </motion.section>
 
-        <h2>Why to choose us?</h2>
+        <motion.section initial="hidden" animate="visible" variants={sectionVariant} className="about-section">
+          <h2>Our Empowering Mission</h2>
+          <p>
+            We are on a journey to digitize home maintenance across the globe. By vetting every professional and streamlining the booking process, we ensure that every service delivered is a testament to our commitment to quality. Our goal is to create a marketplace where trust is the default and excellence is the standard.
+          </p>
+        </motion.section>
+
+        <motion.section initial="hidden" animate="visible" variants={sectionVariant} className="about-section">
+          <h2>The Servease Edge</h2>
           <ul className="list-items">
-            <li>User Friendly Platform</li>
-            <li>Good User Experience</li>
-            <li>Quick Response Time</li>
-            <li>Enhanced Provider Matching</li>
-            <li>Secure and Safe Service Experience</li>
+            <li>Instant Professional Matching</li>
+            <li>Curated Expert Network</li>
+            <li>Transparent Upfront Pricing</li>
+            <li>Seamless Digital Payments</li>
+            <li>Multi-category Excellence</li>
+            <li>Verified Service History</li>
           </ul>
-        <h2>Our Vision</h2>
-        <p id='last-para'>
-          Our vision is to become a trusted and widely recognized home service platform that transforms the way people manage household needs. We aspire to create a system where convenience, safety, and quality service are accessible to everyone. By continuously improving our platform and expanding our service network, we aim to contribute to smarter living and create meaningful opportunities for skilled professionals in the service industry.
-        </p>
+        </motion.section>
+
+        <motion.section initial="hidden" animate="visible" variants={sectionVariant} className="about-section">
+          <h2>Our Vision for the Future</h2>
+          <p>
+            Beyond just a booking platform, we envision Servease as a cornerstone of modern smart living. We are continuously evolving our network and technology to empower skilled professionals and provide homeowners with an unparalleled peace of mind.
+          </p>
+        </motion.section>
       </div>
       <Footer/>
     </>

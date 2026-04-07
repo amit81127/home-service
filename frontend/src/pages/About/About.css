@@ -1,31 +1,98 @@
-.about-page{
-    padding: 0 10px;
-}
-.about-page p{
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+.about-page {
+  max-width: 900px;
+  margin: 100px auto 60px;
+  padding: 0 2rem;
+  animation: fadeUp 0.8s ease-out;
 }
 
-.about-page h1{
-    font-weight: 600;
-    padding: 10px 0;
+.about-page h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+  letter-spacing: -0.05em;
+  text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-page p {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+  font-weight: 400;
+}
+
+.about-section {
+  margin-bottom: 4rem;
+  padding: 3rem;
+  background: white;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+}
+
+.about-page h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.list-items {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.list-items li {
+  padding: 1.25rem;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+}
+
+.list-items li::before {
+  content: '✓';
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.list-items li:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .about-page {
+    margin-top: 80px;
+    padding: 0 1.5rem;
+  }
+  
+  .about-page h1 {
     font-size: 2.5rem;
-}
-
-.about-page h2{
-    font-weight: 600;
-    margin-bottom: 10px;
-    font-size: 2rem;
-}
-
-#last-para{
-    margin-bottom: 30px;
-}
-
-.list-items{
-    list-style-type: disc;
-    margin-bottom: 10px;
-    display: block;
-    list-style-type: disc;
-    padding-left: 30px;
+  }
+  
+  .about-section {
+    padding: 2rem 1.5rem;
+  }
+  
+  .about-page p {
+    font-size: 1.1rem;
+  }
 }

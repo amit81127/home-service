@@ -1,46 +1,52 @@
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ServiceProviderList from "../../components/ServiceProviderList/ServiceProviderList";
-import axios from "axios";
+import axios from "../../api/axios";
 import Footer from "../../components/Footer/Footer";
+import { motion } from "framer-motion";
 
 function SearchResult() {
   const { category } = useParams();
   const [providerInfo, setProviderInfo] = useState([]);
   const [categoryName, setCategoryName] = useState(""); 
 
-  const parameter = ()=>{
-    let str = category;
-    let converted = str.charAt(0).toUpperCase();
-    converted = converted + str.slice(1).toLowerCase();
-    let trimmed = converted.trim();
-    setCategoryName(trimmed);
+  const formatCategory = () => {
+    if (!category) return;
+    const formatted = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+    setCategoryName(formatted.trim());
   }
 
   useEffect(() => {
-    parameter();
-    getProviderInfo();
+    formatCategory();
+  }, [category]);
+
+  useEffect(() => {
+    if (categoryName) {
+      getProviderInfo();
+    }
   }, [categoryName]);
 
   const getProviderInfo = () => {
     axios
-      .get(`/api/serviceProviderinfo?category=${categoryName}`)
+      .get(`/serviceProviderinfo?category=${categoryName}`)
       .then((res) => setProviderInfo(res.data))
-      .catch((err) => console.log("error"));
+      .catch((err) => console.error("Error fetching search results:", err));
   };
 
   return (
-    <div>
+    <div className="services-page">
       <Navbar />
-      <div className="services-top">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="services-top"
+      >
         <div className="service-top-heading">
-          <h2 style={{ fontWeight: "500", marginTop: "20px", padding: "0 10px" , fontSize: "1.5rem"}}>
-          Showing search results for {category} 
-        </h2>
-        </div >
-      </div>
-      <ServiceProviderList providerInfo={providerInfo} text="No result found" />
+          <h2>Search Results for "{categoryName}"</h2>
+        </div>
+      </motion.div>
+      <ServiceProviderList providerInfo={providerInfo} text="No experts matched your search" />
       <Footer />
     </div>
   );

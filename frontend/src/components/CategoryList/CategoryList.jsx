@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import PlumbingIcon from "@mui/icons-material/Plumbing";
@@ -5,99 +7,75 @@ import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatPaintIcon from "@mui/icons-material/FormatPaint";
 import GrassIcon from '@mui/icons-material/Grass';
-import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import PestControlIcon from '@mui/icons-material/PestControl';
 import "./CategoryList.css";
-import{useNavigate} from "react-router-dom"
 
 const icons = {
-  cleaning: (
-    <CleaningServicesIcon
-      id="cleaning"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  construction: (
-    <HandymanIcon
-      id="repair"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  plumbing: (
-    <PlumbingIcon
-      id="plumbing"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  local_shipping: (
-    <LocalShippingIcon
-      id="shipping"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  format_paint: (
-    <FormatPaintIcon
-      id="paint"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  electrical_services: (
-    <ElectricBoltIcon
-      id="electric"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  gardening: (
-    <GrassIcon
-      id="gardening"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
-  pest_control: (
-    <PestControlIcon
-      id="pestControl"
-      className="service-icon"
-      sx={{ height: 40, width: 40 }}
-    />
-  ),
+  cleaning: <CleaningServicesIcon sx={{ fontSize: 32 }} />,
+  construction: <HandymanIcon sx={{ fontSize: 32 }} />,
+  plumbing: <PlumbingIcon sx={{ fontSize: 32 }} />,
+  local_shipping: <LocalShippingIcon sx={{ fontSize: 32 }} />,
+  format_paint: <FormatPaintIcon sx={{ fontSize: 32 }} />,
+  electrical_services: <ElectricBoltIcon sx={{ fontSize: 32 }} />,
+  gardening: <GrassIcon sx={{ fontSize: 32 }} />,
+  pest_control: <PestControlIcon sx={{ fontSize: 32 }} />,
 };
 
-function CategoryList({ categoryList , changeCategory,scroolToServices}) {
+function CategoryList({ categoryList }) {
   const navigate = useNavigate();
 
-  const handleCategoryListOnClick = (category)=>{
-    navigate(`/Services/${category.name}`)
-  }
+  const handleCategoryClick = (category) => {
+    navigate(`/Services/${category.name}`);
+  };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
 
   return (
-    <>
-      <div className="all-cat">
-        <h2 >All Categories</h2>     
-      <div className="icon">
+    <section className="categories-section max-width">
+      <motion.h2 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        Explore Our Services
+      </motion.h2>
+      
+      <motion.div 
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="categories-grid"
+      >
         {categoryList.map((category, index) => (
-          <div key={index} onClick={()=>handleCategoryListOnClick(category)}>
-            <span
-            className="material-symbols-outlined icon-container"
+          <motion.div 
+            key={index}
+            variants={item}
+            whileHover={{ y: -5, scale: 1.02 }}
+            onClick={() => handleCategoryClick(category)}
+            className="category-card"
           >
-            <span style={{ color: category.color }}>
+            <div className="category-icon-wrapper" style={{ backgroundColor: `${category.color}15`, color: category.color }}>
               {icons[category.icon]}
-            </span>
-            <h2>{category.name}</h2>
-          </span>
-          </div> 
+            </div>
+            <h3>{category.name}</h3>
+          </motion.div> 
         ))}
-      </div>
-      </div>
-    </>
+      </motion.div>
+    </section>
   );
 }
 

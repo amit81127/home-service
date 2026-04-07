@@ -10,7 +10,9 @@ import CustomerSignup from "./pages/Signup/CustomerSignup/CustomerSignup";
 import SearchResult from "./pages/SearchResult/SearchResult";
 import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoute";
 import CustomerDashboard from "../src/pages/CustomerDashboard/CustomerDashboard"
+import ProviderDashboard from "../src/pages/ProviderDashboard/ProviderDashboard"
 import RoleBasedRoute from "./components/ProtectedRoutes/RoleBasedRoute";
+import Bookings from "./pages/Bookings/Bookings";
 
 function App() {
   return (
@@ -31,6 +33,24 @@ function App() {
               <RoleBasedRoute allowedRoles={["customer"]}>
                 <CustomerDashboard/>
               </RoleBasedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Provider_dashboard"
+          element={
+            <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={["service_provider"]}>
+                <ProviderDashboard/>
+              </RoleBasedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Bookings"
+          element={
+            <ProtectedRoute>
+              <Bookings />
             </ProtectedRoute>
           }
         />

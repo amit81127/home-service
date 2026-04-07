@@ -1,11 +1,9 @@
-import pool from '../config/db.js'
+import Category from '../models/Category.js';
 
 export const getCategories = async (req, res)=>{
   try{
-    const result = await pool.query(
-    'SELECT * FROM "ServiceCategory" ORDER BY id ASC'
-  );
-  res.status(200).json(result.rows)
+    const categories = await Category.find().sort({ _id: 1 });
+    res.status(200).json(categories);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -13,14 +11,13 @@ export const getCategories = async (req, res)=>{
 }
 
 export const createCategory = async(req, res) =>{
+  try {
     const {name, icon, color} = req.body;
-
-    const result = await pool.query(
-      `INSERT INTO "ServiceCategory" (name, icon, color)
-       VALUES ($1, $2, $3)
-       RETURNING *`,
-      [name, icon, color]
-    );
-
-    res.json(result.rows[0]);
+    const newCategory = new Category({ name, icon, color });
+    await newCategory.save();
+    res.json(newCategory);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 }
